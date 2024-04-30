@@ -30,6 +30,31 @@ app.get('/api/persons', (request, response) => {
   response.json(persons)
 })
 
+app.get('/info', (request, response) => {
+  const personsInArray = persons.length
+  //Getting time zone of the user and print it to the screen
+  const timestampInMillis = Date.now();
+  const date = new Date(timestampInMillis);
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const formattedDate = date.toLocaleString("en-US", {
+    timeZone: userTimeZone,
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZoneName: "longOffset",
+  });
+
+  response.send('<div style="display: flex; align-items: center;">\n' +
+    '<p style="margin-right: 10px;">Phonebook has info for</p>\n' +
+    personsInArray + '\n<p>people</p>\n' +
+    '</div>' +
+    formattedDate)
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Listening on PORT ${PORT}`)
