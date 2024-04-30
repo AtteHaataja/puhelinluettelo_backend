@@ -1,0 +1,11 @@
+{
+  "name": "puhelinluettelo_backend",
+  "version": "0.0.1",
+  "description": "backend code exercise for https://fullstackopen.com/osa3 course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Atte Haataja",
+  "license": "ISC"
+}
