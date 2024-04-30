@@ -49,11 +49,22 @@ app.get('/info', (request, response) => {
   });
 
   response.send('<div style="display: flex; align-items: center;">\n' +
-    '<p style="margin-right: 10px;">Phonebook has info for</p>\n' +
-    personsInArray + '\n<p>people</p>\n' +
-    '</div>' +
-    formattedDate)
+                      '<p style="margin-right: 10px;">Phonebook has info for</p>\n' +
+                      personsInArray + '\n<p>people</p>\n' +
+                      '</div>' +
+                formattedDate)
 })
+
+app.get('/api/persons/:id', (request, response) => {
+  const personId = Number(request.params.id);
+  const person = persons.find(person => person.id === personId);
+  if (person) {
+    response.json(person)
+  } else {
+    response.status(404).end();
+  }
+})
+
 
 const PORT = 3001
 app.listen(PORT, () => {
