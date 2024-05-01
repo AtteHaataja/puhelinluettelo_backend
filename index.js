@@ -81,17 +81,24 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body;
 
-  const newPerson = {
-    name: body.name,
-    number: body.phonenumber,
-    id: generateId(),
+  if (!body.name){
+    response.status(400).json({error: 'Name is required'});
+  } else if (!body.phonenumber) {
+    response.status(400).json({error: 'Phone number is required'});
+  } else if (persons.find(person => person.name === body.name)) {
+    response.status(400).json({error: 'Name already in the phonebook'});
+  } else {
+    const newPerson = {
+      name: body.name,
+      number: body.phonenumber,
+      id: generateId(),
+    }
+    console.log(newPerson);
+    persons = persons.concat(newPerson);
+    console.log(persons);
+
+    response.json(newPerson);
   }
-
-  console.log(newPerson);
-  persons = persons.concat(newPerson);
-  console.log(persons);
-
-  response.json(newPerson);
 })
 
 const PORT = 3001
