@@ -16,12 +16,12 @@ morgan.token('postData', (req) => {
 });
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms - :postData'))
 
-const generateId = () => {
+/*const generateId = () => {
   const newId = Math.floor(Math.random() * 1000 );
   return newId;
-}
+}*/
 
-
+let personsArray = []
 /*let persons = [
   {
     id: 1,
@@ -48,12 +48,16 @@ const generateId = () => {
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-    response.json(persons)
+    personsArray = response.json(persons)
   })
 })
 
+//INFO SIVU PÄIVITTYY VIIVEELLÄ. PITÄÄ KORJATA.
 app.get('/info', (request, response) => {
-  const personsInArray = persons.length
+  Person.find({}).then(persons => {
+    personsArray = persons
+  })
+  const personsInArray =  personsArray.length
   //Getting time zone of the user and print it to the screen
   const timestampInMillis = Date.now();
   const date = new Date(timestampInMillis);
@@ -101,19 +105,19 @@ app.post('/api/persons', (request, response) => {
     response.status(400).json({error: 'Name is required'});
   } else if (!body.phonenumber) {
     response.status(400).json({error: 'Phone number is required'});
-  } else if (persons.find(person => person.name === body.name)) {
+  } else if (personsArray.find(person => person.name === body.name)) {
     response.status(400).json({error: 'Name already in the phonebook'});
   } else {
-    const newPerson = {
+    const person = new Person ({
       name: body.name,
       number: body.phonenumber,
-      id: generateId(),
-    }
-    console.log(newPerson);
-    persons = persons.concat(newPerson);
-    console.log(persons);
-
-    response.json(newPerson);
+    })
+    console.log(Person);
+    //persons = persons.concat(newPerson);
+    //console.log(persons);
+    person.save().then(savedPerson => {
+      response.json(savedPerson);
+    })
   }
 })
 
