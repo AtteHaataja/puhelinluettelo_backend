@@ -48,7 +48,7 @@ let personsArray = []
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-    personsArray = response.json(persons)
+    response.json(persons)
   })
 })
 
@@ -105,9 +105,9 @@ app.post('/api/persons', (request, response) => {
     response.status(400).json({error: 'Name is required'});
   } else if (!body.phonenumber) {
     response.status(400).json({error: 'Phone number is required'});
-  } else if (personsArray.find(person => person.name === body.name)) {
+  } /*else if (personsArray.find(person => person.name === body.name)) {
     response.status(400).json({error: 'Name already in the phonebook'});
-  } else {
+  }*/ else {
     const person = new Person ({
       name: body.name,
       number: body.phonenumber,
