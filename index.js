@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const app = express();
 const cors = require('cors');
 const Person = require('./models/person')
+const {request, response} = require("express");
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json());
@@ -52,43 +53,45 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-//INFO SIVU PÄIVITTYY VIIVEELLÄ. PITÄÄ KORJATA.
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.find({}).then(persons => {
-    personsArray = persons
-  })
-  const personsInArray =  personsArray.length
-  //Getting time zone of the user and print it to the screen
-  const timestampInMillis = Date.now();
-  const date = new Date(timestampInMillis);
-  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const formattedDate = date.toLocaleString("en-US", {
-    timeZone: userTimeZone,
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZoneName: "longOffset",
-  });
+    const personsInArray = persons.length;
 
-  response.send('<div style="display: flex; align-items: center;">\n' +
-                      '<p style="margin-right: 10px;">Phonebook has info for</p>\n' +
-                      personsInArray + '\n<p>people</p>\n' +
-                      '</div>' +
-                formattedDate)
+    // Getting time zone of the user and print it to the screen
+    const timestampInMillis = Date.now();
+    const date = new Date(timestampInMillis);
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formattedDate = date.toLocaleString("en-US", {
+      timeZone: userTimeZone,
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZoneName: "longOffset",
+    });
+
+    response.send('<div style="display: flex; align-items: center;">\n' +
+      '<p style="margin-right: 10px;">Phonebook has info for</p>\n' +
+      personsInArray + '\n<p>people</p>\n' +
+      '</div>' +
+      formattedDate);
+  }).catch(error => next(error));
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  const personId = Number(request.params.id);
-  const person = persons.find(person => person.id === personId);
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end();
-  }
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error))
+
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -122,6 +125,21 @@ app.post('/api/persons', (request, response) => {
       response.json(savedPerson);
     })
   }
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  console.log('body')
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Person.findByIdAndUpdate(request.params.id, person, {new:true})
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
